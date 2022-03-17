@@ -1,19 +1,17 @@
 import mongoose from 'mongoose';
 import {jsonFormatterPlugin, throwErrorIfDoesNotExist} from '../utils/mongoose-utils';
 
-const {Schema} = mongoose;
-
-const ChapterSchema = new Schema({
+const ChapterSchema = new mongoose.Schema({
     name: {
         type: String,
     },
     audioUrl: {
         type: String,
     },
-
+    durationSeconds: Number
 });
 
-const BookSchema = new Schema({
+const BookSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -31,7 +29,8 @@ const BookSchema = new Schema({
     },
     authors: [String],
     chapters: [ChapterSchema],
-    durationMinutes: Number
+    durationMinutes: Number,
+    audioDurationSeconds: Number
 }, {timestamps: true});
 
 mongoose.model('BookSchema', BookSchema);

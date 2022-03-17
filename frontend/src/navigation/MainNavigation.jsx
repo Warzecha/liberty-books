@@ -1,12 +1,19 @@
 import React from 'react';
+import {
+    Routes,
+    Route,
+} from 'react-router-dom';
 import BooksListContainer from '../components/BooksList/BooksListContainer';
-import {Router} from '@reach/router';
+import BookDetails from '../components/BookDetails/BookDetails';
 
 const MainNavigation = () => {
     return (
-        <Router>
-            <BooksListContainer path="/books"/>
-        </Router>
+
+        <Routes>
+            <Route path="/books/:bookId" element={<BookDetails/>}/>
+            <Route path="/books" element={<BooksListContainer/>}/>
+
+        </Routes>
     );
 };
 

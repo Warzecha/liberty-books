@@ -1,35 +1,54 @@
 import React from 'react';
-import {createUseStyles, useTheme} from 'react-jss';
-import {Link} from '@reach/router';
+import {createUseStyles} from 'react-jss'
+import {
+    Link,
+    useMatch,
+    useResolvedPath,
+} from "react-router-dom";
 
-const SideBarLink = ({title, to, active}) => {
-    const classes = useStyles({active});
+const SideBarLink = ({title, to, Icon}) => {
+    let resolved = useResolvedPath(to);
+    let match = useMatch({ path: resolved.pathname, end: true });
+
+    const classes = useStyles({active: !!match});
     return (
-        <div className={classes.container}>
-            <Link to={to} className={classes.link}>
+        <Link to={to} className={classes.container} get>
+            <div className={classes.iconContainer}>
+                <Icon/>
+            </div>
+            <span className={classes.label}>
                 {title}
-            </Link>
-
-        </div>
+            </span>
+        </Link>
     );
 };
 
 const useStyles = createUseStyles(theme => ({
     container: {
         // width: '100%',
-        margin: 4,
         padding: 8,
         borderRadius: 4,
         backgroundColor: ({active}) => active ? '#e6e6e6' : 'transparent',
+        color: theme.palette.text.primary,
+        textDecoration: 'none',
+
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
         '&:hover': {
             backgroundColor: '#e9e9e9'
         }
     },
-    link: {
-        textDecoration: 'none',
-        color: theme.palette.text.primary,
+    label: {
         fontSize: 16,
         fontWeight: 600
+    },
+    iconContainer: {
+        padding: 4,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 }));
 

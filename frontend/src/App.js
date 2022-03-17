@@ -3,10 +3,8 @@ import store from './store';
 import MainNavigation from './navigation/MainNavigation';
 import SideBar from './components/SideBar/SideBar';
 import {ThemeProvider} from 'react-jss';
-
-const {
-    PUBLIC_URL
-} = process.env;
+import {BrowserRouter} from 'react-router-dom';
+import AudioBookPlayer from './components/AudiobookPlayer/AudioBookPlayer';
 
 function App() {
 
@@ -23,7 +21,8 @@ function App() {
                 secondary: 'rgba(0,0,0,0.60)'
             },
             action: {
-                active: 'rgba(0,0,0,0.60)'
+                active: 'rgba(0,0,0,0.60)',
+                hoverBackground: 'rgba(234,234,234,0.6)'
             }
         }
     };
@@ -31,11 +30,15 @@ function App() {
     return (
         <Provider store={store}>
             <ThemeProvider theme={theme}>
-                <div style={{display: 'flex'}}>
-                    <SideBar/>
-
-                    <MainNavigation/>
-                </div>
+                <BrowserRouter>
+                    <div style={{display: 'flex'}}>
+                        <SideBar/>
+                        <div style={{padding: 8}}>
+                            <MainNavigation/>
+                        </div>
+                        <AudioBookPlayer/>
+                    </div>
+                </BrowserRouter>
             </ThemeProvider>
         </Provider>
     );

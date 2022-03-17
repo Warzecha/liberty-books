@@ -1,13 +1,18 @@
 import {configureStore} from '@reduxjs/toolkit';
 import booksReducer from './booksReducer';
+import audioPlayerReducer from './audioPlayerReducer';
+import {booksApi} from '../services/books';
 
-const reducer = {
-    books: booksReducer,
-};
+
 
 const store = configureStore({
-    reducer: reducer,
-    devTools: true
+    reducer: {
+        audioPlayer: audioPlayerReducer,
+        [booksApi.reducerPath]: booksApi.reducer
+    },
+    devTools: true,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(booksApi.middleware),
 });
 
 export default store;
