@@ -5,7 +5,8 @@ import {
     FiFastForward,
     FiRewind,
     FiPlay,
-    FiPause
+    FiPause,
+    FiList
 } from 'react-icons/fi';
 import {formatMillisAsTimePeriod} from './utils';
 import Button from '../common/Button';
@@ -22,6 +23,7 @@ const AudioBookPlayerView = props => {
         onScrub,
         onPlaybackRateChange,
         playbackRate,
+        chapters,
     } = props;
 
     const classes = useStyles();
@@ -29,14 +31,36 @@ const AudioBookPlayerView = props => {
     return (
         <div className={classes.container}>
 
-            <div className={classes.currentlyPlayedInfo}>
+            <div className={classes.upperRow}>
+                <div className={classes.currentlyPlayedInfo}>
                 <span>
                     {title}
                 </span>
-                <span className={classes.chapterName}>
+                    <span className={classes.chapterName}>
                     {chapterName}
                 </span>
+                </div>
+
+                <div className={classes.chapterListButton}>
+                    <IconButton>
+                        <div className={classes.chapterListContainer}>
+                            {
+                                chapters.map(({name, offsetSeconds}, i) => (
+                                    <div key={`chapter-${i}`} className={classes.chapterListItem}>
+                                        <span>{name}</span>
+
+                                        <IconButton onClick={() => onScrub(offsetSeconds)}>
+                                            <FiPlay/>
+                                        </IconButton>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                        <FiList/>
+                    </IconButton>
+                </div>
             </div>
+
 
             <div className={classes.row}>
                 <div className={classes.audioControls}>
@@ -67,12 +91,19 @@ const AudioBookPlayerView = props => {
                     max={duration}
                     value={currentTime || 0}
                     onInput={event => onScrub(event.target.value)}
+                    list="steplist"
                     className={classes.slider}
                 />
 
+                <datalist id="steplist">
+                    {(chapters && chapters.length > 0) && chapters.map(({offsetSeconds}, i) => (
+                        <option key={`step-${i}`}>{parseInt(offsetSeconds)}</option>
+                    ))}
+                </datalist>
+
                 <span className={classes.timeContainer}>
-                {duration ? formatMillisAsTimePeriod(duration * 1000) : '00:00'}
-            </span>
+                    {duration ? formatMillisAsTimePeriod(duration * 1000) : '00:00'}
+                </span>
             </div>
         </div>
     );
@@ -93,6 +124,11 @@ const useStyles = createUseStyles(theme => ({
         alignItems: 'center',
         padding: 8
     },
+    upperRow: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
     chapterName: {
         marginLeft: 8,
         color: theme.palette.text.secondary
@@ -112,6 +148,28 @@ const useStyles = createUseStyles(theme => ({
     },
     slider: {
         width: '100%'
+    },
+    chapterListButton: {
+        '&:hover $chapterListContainer': {
+            visibility: 'visible'
+        },
+    },
+    chapterListContainer: {
+        visibility: 'hidden',
+        position: 'absolute',
+        bottom: 100,
+        right: 0,
+        padding: 4,
+        borderRadius: 4,
+        border: '1px solid #ddd',
+        display: 'flex',
+        flexDirection: 'column',
+        pointer: 'default'
+    },
+    chapterListItem: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     }
 }));
 

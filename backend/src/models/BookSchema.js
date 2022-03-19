@@ -8,7 +8,8 @@ const ChapterSchema = new mongoose.Schema({
     audioUrl: {
         type: String,
     },
-    durationSeconds: Number
+    durationSeconds: Number,
+    offsetSeconds: Number
 });
 
 const BookSchema = new mongoose.Schema({
