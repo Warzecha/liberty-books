@@ -1,24 +1,26 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import {useGetBookByIdQuery} from '../../services/books';
 import {useSelector} from 'react-redux';
 import AudioBookPlayerView from './AudioBookPlayerView';
 import {findCurrentChapter} from './utils';
 
+const applyPlaybackSpeedFromLocalStorage = (audio) => {
+    const storedPlaybackRate = localStorage.getItem('playbackRate');
+    try {
+        audio.playbackRate = parseFloat(storedPlaybackRate);
+    } catch (err) {
+        audio.playbackRate = 1.0;
+    }
+};
+
 const AudioBookPlayer = () => {
-    // const {bookId} = useParams();
 
     const {
         currentlyPlayedBookId,
-        currentBookProgressSeconds,
-        // currentChapter
     } = useSelector(state => state.audioPlayer);
 
     const {
-        data,
-        error,
-        isLoading,
-        requestId
+        data, error, isLoading, requestId
     } = useGetBookByIdQuery(currentlyPlayedBookId, {skip: !currentlyPlayedBookId});
 
     const [currentChapter, setCurrentChapter] = useState(0);
@@ -48,13 +50,7 @@ const AudioBookPlayer = () => {
     }, [requestId]);
 
     const {
-        id,
-        title,
-        description,
-        coverImage,
-        authors,
-        chapters = [],
-        audioDurationSeconds
+        id, title, description, coverImage, authors, chapters = [], audioDurationSeconds
     } = data || {};
 
     const [audioState, setAudioState] = useState(null);
@@ -72,16 +68,19 @@ const AudioBookPlayer = () => {
     }, [currentChapter, id]);
 
     const updateCurrentTime = (newTime) => {
-        console.log('updateCurrentTime', chapters, newTime);
         const {chapterIndex, timeOffset, totalTimeOffset} = findCurrentChapter(chapters, newTime);
-        console.log('play chapter: ', chapterIndex);
         playAudioAtTime(chapters[chapterIndex].audioUrl, timeOffset);
         setCurrentChapter(chapterIndex);
         setTotalTimeOffset(totalTimeOffset);
     };
 
+    useEffect(() => {
+        console.debug('Chapter changed: ', currentChapter);
+    }, [currentChapter]);
+
     const playNextChapter = () => {
-        if (currentChapter < chapters.length) {
+        console.debug('Play next chapter: ', currentChapter, chapters.length);
+        if (currentChapter < chapters.length - 1) {
             const nextChapterIndex = currentChapter + 1;
             const {audioUrl} = chapters[nextChapterIndex];
             const {durationSeconds: prevChapterDuration} = chapters[currentChapter];
@@ -90,15 +89,20 @@ const AudioBookPlayer = () => {
 
             playAudioAtTime(audioUrl, 0);
         } else {
-            alert('Audiobook end!');
+            console.info('Audiobook end!');
         }
     };
 
     const playAudioAtTime = (audioUrl, timeOffset) => {
+        console.debug('playAudioAtTime: ', audioUrl, timeOffset)
         if (audioState) {
             audioState.pause();
-            audioState.src = audioUrl;
+            if (audioState.src !== audioUrl) {
+                audioState.src = audioUrl;
+            }
             audioState.currentTime = timeOffset;
+            applyPlaybackSpeedFromLocalStorage(audioState);
+            audioState.onended = playNextChapter;
             audioState.play();
         } else {
             const tmpAudio = new Audio(audioUrl);
@@ -106,16 +110,8 @@ const AudioBookPlayer = () => {
                 tmpAudio.play();
             });
 
-            tmpAudio.onended = () => {
-                playNextChapter();
-            };
-
-            const storedPlaybackRate = localStorage.getItem('playbackRate');
-            try {
-                tmpAudio.playbackRate = parseFloat(storedPlaybackRate);
-            } catch (err) {
-                tmpAudio.playbackRate = 1.0;
-            }
+            tmpAudio.onended = playNextChapter;
+            applyPlaybackSpeedFromLocalStorage(tmpAudio);
             setAudioState(tmpAudio);
         }
     };
@@ -161,9 +157,9 @@ const AudioBookPlayer = () => {
     }, [audioState]);
 
     if (currentlyPlayedBookId) {
-        return (
-            <AudioBookPlayerView
+        return (<AudioBookPlayerView
                 title={title}
+                chapters={chapters}
                 chapterName={chapterName}
                 isPlaying={audioState ? !audioState.paused : false}
                 onPlayPauseClicked={handlePlayPauseClicked}
@@ -173,22 +169,13 @@ const AudioBookPlayer = () => {
                 onScrub={updateCurrentTime}
                 onPlaybackRateChange={handlePlaybackRateChange}
                 playbackRate={playbackRate}
-            />
-        );
+            />);
     } else {
         return null;
     }
 
 };
 
-const availablePlaybackRates = [
-    0.5,
-    0.8,
-    1.0,
-    1.2,
-    1.5,
-    1.8,
-    2.0
-];
+const availablePlaybackRates = [0.5, 0.8, 1.0, 1.2, 1.5, 1.8, 2.0];
 
 export default AudioBookPlayer;

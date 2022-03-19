@@ -25,11 +25,18 @@ const createBook = async (createBookRequest) => {
             };
         }));
 
+        const chaptersWithCumulativeOffset = chaptersWithDuration.reduce((arr, chapter) => {
+            const prevChapterOffset = arr.length > 0 ? arr[arr.length - 1].offsetSeconds : 0;
+            const prevChapterDuration = arr.length > 0 ? arr[arr.length - 1].durationSeconds : 0;
+            arr.push({...chapter, offsetSeconds: prevChapterOffset + prevChapterDuration});
+            return arr;
+        }, []);
+
         const totalAudioDuration = chaptersWithDuration.reduce(((prev, {durationSeconds}) => prev + durationSeconds), 0);
 
         const bookToCreate = {
             ...createBookRequest,
-            chapters: chaptersWithDuration,
+            chapters: chaptersWithCumulativeOffset,
             audioDurationSeconds: totalAudioDuration
         };
 
