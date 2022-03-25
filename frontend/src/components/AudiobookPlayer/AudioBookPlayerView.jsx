@@ -9,7 +9,7 @@ import {
     FiList
 } from 'react-icons/fi';
 import {formatMillisAsTimePeriod} from './utils';
-import Button from '../common/Button';
+import TextButton from '../common/buttons/TextButton';
 
 const AudioBookPlayerView = props => {
     const {
@@ -76,9 +76,9 @@ const AudioBookPlayerView = props => {
                         <FiFastForward/>
                     </IconButton>
 
-                    <Button onClick={() => onPlaybackRateChange()}>
+                    <TextButton onClick={() => onPlaybackRateChange()}>
                         {`${playbackRate || 1}x`}
-                    </Button>
+                    </TextButton>
                 </div>
 
                 <span className={classes.timeContainer} style={{textAlign: 'right'}}>

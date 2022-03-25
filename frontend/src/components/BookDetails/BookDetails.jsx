@@ -3,9 +3,9 @@ import {useGetBookByIdQuery} from '../../services/books';
 import {Link, useParams} from 'react-router-dom';
 
 import {createUseStyles} from 'react-jss';
-import Button from '../common/Button';
 import {useDispatch} from 'react-redux';
 import {setCurrentBookId} from '../../store/audioPlayerReducer';
+import FilledButton from '../common/buttons/FilledButton';
 
 const BookDetails = () => {
     const {bookId} = useParams();
@@ -54,9 +54,9 @@ const BookDetails = () => {
             </div>
 
             <div>
-                <Button onClick={handleListen}>
+                <FilledButton onClick={handleListen}>
                     Listen now
-                </Button>
+                </FilledButton>
 
             </div>
 
