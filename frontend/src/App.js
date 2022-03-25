@@ -14,7 +14,7 @@ function App() {
 
         palette: {
             primary: {
-                main: '#1976d2'
+                main: '#FD4759'
             },
             text: {
                 primary: 'rgba(0,0,0,0.87)',

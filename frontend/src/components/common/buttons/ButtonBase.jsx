@@ -1,11 +1,12 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss';
+import classNames from 'classnames';
 
-const Button = (props) => {
+const ButtonBase = ({className, ...props}) => {
     const classes = useStyles();
 
     return (
-        <button {...props} className={classes.button}/>
+        <button {...props} className={classNames(classes.button, className)}/>
     );
 };
 
@@ -13,7 +14,7 @@ const useStyles = createUseStyles(theme => ({
     button: {
         borderRadius: 8,
         color: theme.palette.text.primary,
-        border: 'none',
+        border: '1px solid transparent',
         padding: '6px 16px',
         textAlign: 'center',
         textDecoration: 'none',
@@ -22,10 +23,10 @@ const useStyles = createUseStyles(theme => ({
         textTransform: 'uppercase',
         cursor: 'pointer',
         backgroundColor: 'transparent',
-        '&:hover': {
-            backgroundColor: theme.palette.action.hoverBackground,
-        }
+        // '&:hover': {
+        //     backgroundColor: theme.palette.action.hoverBackground,
+        // }
     }
-}))
+}));
 
-export default Button;
+export default ButtonBase;
